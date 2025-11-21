@@ -1,0 +1,35 @@
+FINAL STATES FOR DIFFERENT GATE ORDERINGS
+============================================================
+
+Initial State: |0⟩ = [1, 0]
+
+H → P → T:
+  State vector: [0.707107+0.000000j, -0.500000+0.500000j]
+  Probabilities: |0⟩ = 0.5000, |1⟩ = 0.5000
+  Bloch coordinates: x = -0.7071, y = 0.7071, z = 0.0000
+
+H → T → P:
+  State vector: [0.707107+0.000000j, -0.500000+0.500000j]
+  Probabilities: |0⟩ = 0.5000, |1⟩ = 0.5000
+  Bloch coordinates: x = -0.7071, y = 0.7071, z = 0.0000
+
+P → H → T:
+  State vector: [0.707107+0.000000j, 0.500000+0.500000j]
+  Probabilities: |0⟩ = 0.5000, |1⟩ = 0.5000
+  Bloch coordinates: x = 0.7071, y = 0.7071, z = 0.0000
+
+P → T → H:
+  State vector: [0.707107+0.000000j, 0.707107+0.000000j]
+  Probabilities: |0⟩ = 0.5000, |1⟩ = 0.5000
+  Bloch coordinates: x = 1.0000, y = 0.0000, z = 0.0000
+
+T → H → P:
+  State vector: [0.707107+0.000000j, 0.000000+0.707107j]
+  Probabilities: |0⟩ = 0.5000, |1⟩ = 0.5000
+  Bloch coordinates: x = 0.0000, y = 1.0000, z = 0.0000
+
+T → P → H:
+  State vector: [0.707107+0.000000j, 0.707107+0.000000j]
+  Probabilities: |0⟩ = 0.5000, |1⟩ = 0.5000
+  Bloch coordinates: x = 1.0000, y = 0.0000, z = 0.0000
+
