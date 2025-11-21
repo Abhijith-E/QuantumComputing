@@ -1,0 +1,24 @@
+QUANTUM CIRCUIT SIMULATION RESULTS
+==================================================
+
+Circuit Information:
+Number of qubits: 2
+Number of classical bits: 2
+Circuit depth: 6
+Total gates: 7
+Gate breakdown: OrderedDict([('h', 2), ('cx', 2), ('measure', 2), ('z', 1)])
+
+Measurement Results (1024 shots each):
+==================================================
+
+Input State |00>:
+  |10>: 1024 (100.00%)
+
+Input State |01>:
+  |11>: 1024 (100.00%)
+
+Input State |10>:
+  |00>: 1024 (100.00%)
+
+Input State |11>:
+  |01>: 1024 (100.00%)
