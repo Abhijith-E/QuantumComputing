@@ -1,6 +1,6 @@
 """
-Quantum Tunneling Simulator - Core Module
-==========================================
+Quantum Tunneling Simulator - Core Module (OPTIMIZED)
+======================================================
 This module implements the fundamental quantum mechanics for tunneling calculations.
 """
 
@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
 from scipy.constants import hbar, m_e, e
+from tqdm import tqdm
 
 class QuantumTunnelingSimulator:
     """
@@ -54,85 +55,6 @@ class QuantumTunnelingSimulator:
         T = np.exp(-2 * k * barrier_width)
         
         return T
-    
-    def calculate_tunneling_probability_wkb(self, barrier_func, x_start, x_end, particle_energy):
-        """
-        Calculate tunneling probability using WKB (Wentzel-Kramers-Brillouin) approximation.
-        This works for arbitrary barrier shapes.
-        
-        Parameters:
-        -----------
-        barrier_func : callable
-            Function V(x) describing the potential barrier
-        x_start : float
-            Starting position of barrier
-        x_end : float
-            Ending position of barrier
-        particle_energy : float
-            Energy of the particle
-            
-        Returns:
-        --------
-        float : Tunneling probability (0 to 1)
-        """
-        def integrand(x):
-            V = barrier_func(x)
-            if V <= particle_energy:
-                return 0
-            return np.sqrt(2 * self.mass * (V - particle_energy))
-        
-        # Perform integration
-        integral, _ = quad(integrand, x_start, x_end)
-        
-        # WKB tunneling probability
-        T = np.exp(-2 * integral / self.hbar)
-        
-        return T
-    
-    def simulate_wavefunction(self, barrier_func, x_range, particle_energy, num_points=1000):
-        """
-        Simulate the quantum wavefunction through a barrier.
-        
-        Parameters:
-        -----------
-        barrier_func : callable
-            Function V(x) describing the potential barrier
-        x_range : tuple
-            (x_min, x_max) spatial range
-        particle_energy : float
-            Energy of the particle
-        num_points : int
-            Number of spatial points
-            
-        Returns:
-        --------
-        x : ndarray
-            Position array
-        psi : ndarray
-            Wavefunction amplitude
-        V : ndarray
-            Potential energy at each position
-        """
-        x = np.linspace(x_range[0], x_range[1], num_points)
-        V = np.array([barrier_func(xi) for xi in x])
-        
-        # Simplified wavefunction calculation (approximate)
-        psi = np.zeros_like(x, dtype=complex)
-        
-        for i, xi in enumerate(x):
-            if V[i] < particle_energy:
-                # Classical region - oscillating wave
-                k = np.sqrt(2 * self.mass * (particle_energy - V[i])) / self.hbar
-                psi[i] = np.exp(1j * k * xi)
-            else:
-                # Tunneling region - exponentially decaying
-                kappa = np.sqrt(2 * self.mass * (V[i] - particle_energy)) / self.hbar
-                psi[i] = np.exp(-kappa * xi)
-        
-        # Normalize
-        psi = psi / np.sqrt(np.sum(np.abs(psi)**2))
-        
-        return x, psi, V
 
 
 class MolecularEnergyLandscape:
@@ -269,7 +191,7 @@ def demo_tunneling_basics():
     print(f"  Height: {barrier_height/e:.3f} eV")
     
     # Calculate tunneling for different energies
-    energies = np.linspace(0.1, 0.9, 9) * barrier_height
+    energies = np.linspace(0.1, 0.9, 5) * barrier_height  # Reduced from 9 to 5
     probabilities = []
     
     print("\nTunneling Probabilities:")
@@ -297,47 +219,29 @@ def demo_tunneling_basics():
     ax1.legend()
     ax1.set_yscale('log')
     
-    # Plot 2: Potential barrier and wavefunction
-    def rectangular_barrier(x):
-        if 0 <= x <= barrier_width:
-            return barrier_height
-        return 0
-    
-    x_sim = np.linspace(-2*barrier_width, 3*barrier_width, 1000)
-    V_sim = np.array([rectangular_barrier(xi) for xi in x_sim])
-    
-    # Simple wavefunction visualization
-    particle_energy = 0.5 * barrier_height
-    psi = np.zeros_like(x_sim)
-    
+    # Plot 2: Potential barrier visualization (simplified)
+    x_sim = np.linspace(-2*barrier_width, 3*barrier_width, 200)  # Reduced from 1000
+    V_sim = np.zeros_like(x_sim)
     for i, xi in enumerate(x_sim):
-        if xi < 0:
-            k = np.sqrt(2 * simulator.mass * particle_energy) / simulator.hbar
-            psi[i] = np.cos(k * xi)
-        elif 0 <= xi <= barrier_width:
-            kappa = np.sqrt(2 * simulator.mass * (barrier_height - particle_energy)) / simulator.hbar
-            psi[i] = np.exp(-kappa * xi)
-        else:
-            k = np.sqrt(2 * simulator.mass * particle_energy) / simulator.hbar
-            T = simulator.calculate_tunneling_probability_rectangular(
-                barrier_width, barrier_height, particle_energy
-            )
-            psi[i] = np.sqrt(T) * np.cos(k * (xi - barrier_width))
+        if 0 <= xi <= barrier_width:
+            V_sim[i] = barrier_height
+    
+    particle_energy = 0.5 * barrier_height
     
     ax2.plot(x_sim*1e10, V_sim/e, 'r-', linewidth=2, label='Potential Barrier')
-    ax2.axhline(y=particle_energy/e, color='g', linestyle='--', label='Particle Energy')
-    ax2.plot(x_sim*1e10, np.abs(psi)**2 * 0.3 * barrier_height/e, 'b-', linewidth=1.5, label='|ψ|² (probability density)')
+    ax2.axhline(y=particle_energy/e, color='g', linestyle='--', label='Particle Energy', linewidth=2)
+    ax2.fill_between(x_sim*1e10, 0, V_sim/e, alpha=0.3, color='red')
     ax2.set_xlabel('Position (Angstroms)', fontsize=12)
     ax2.set_ylabel('Energy (eV)', fontsize=12)
-    ax2.set_title('Quantum Wavefunction Through Barrier', fontsize=14, fontweight='bold')
+    ax2.set_title('Potential Barrier Structure', fontsize=14, fontweight='bold')
     ax2.legend()
     ax2.grid(True, alpha=0.3)
     ax2.set_ylim(-0.1, barrier_height/e * 1.2)
     
     plt.tight_layout()
-    plt.savefig('quantum_tunneling_basics.png', dpi=300, bbox_inches='tight')
+    plt.savefig('quantum_tunneling_basics.png', dpi=150, bbox_inches='tight')  # Reduced DPI
     print("\n✓ Visualization saved as 'quantum_tunneling_basics.png'")
-    plt.show()
+    plt.close()
 
 
 def demo_molecular_landscape():
@@ -364,19 +268,11 @@ def demo_molecular_landscape():
     print(f"  Number of binding sites: {len(landscape.minima)}")
     print(f"  Number of barriers: {len(landscape.barriers)}")
     
-    print("\nBinding Sites:")
-    for i, site in enumerate(landscape.minima):
-        print(f"  Site {i+1}: Position {site['position']}, Depth {site['depth']:.2f}")
-    
-    print("\nEnergy Barriers:")
-    for i, barrier in enumerate(landscape.barriers):
-        print(f"  Barrier {i+1}: Position {barrier['position']}, Height {barrier['height']:.2f}")
-    
-    # Generate landscape
-    X, Y, Z = landscape.generate_2d_landscape(x_range=(0, 8), y_range=(0, 8), resolution=150)
+    # Generate landscape (reduced resolution)
+    X, Y, Z = landscape.generate_2d_landscape(x_range=(0, 8), y_range=(0, 8), resolution=80)
     
     # Visualization
-    fig = plt.figure(figsize=(16, 6))
+    fig = plt.figure(figsize=(15, 5))
     
     # 3D surface plot
     ax1 = fig.add_subplot(131, projection='3d')
@@ -389,12 +285,12 @@ def demo_molecular_landscape():
     
     # Contour plot
     ax2 = fig.add_subplot(132)
-    contour = ax2.contourf(X, Y, Z, levels=30, cmap='viridis')
+    contour = ax2.contourf(X, Y, Z, levels=20, cmap='viridis')
     ax2.contour(X, Y, Z, levels=10, colors='white', alpha=0.3, linewidths=0.5)
     
     # Mark minima and barriers
     for site in landscape.minima:
-        ax2.plot(site['position'][0], site['position'][1], 'r*', markersize=15, label='Binding Site')
+        ax2.plot(site['position'][0], site['position'][1], 'r*', markersize=15)
     for barrier in landscape.barriers:
         ax2.plot(barrier['position'][0], barrier['position'][1], 'wx', markersize=12, markeredgewidth=2)
     
@@ -405,8 +301,8 @@ def demo_molecular_landscape():
     
     # Energy profile along a line
     ax3 = fig.add_subplot(133)
-    line_x = np.linspace(0, 8, 200)
-    line_y = 4.0  # Horizontal line
+    line_x = np.linspace(0, 8, 100)  # Reduced from 200
+    line_y = 4.0
     line_energies = [landscape.calculate_energy([x, line_y]) for x in line_x]
     
     ax3.plot(line_x, line_energies, 'b-', linewidth=2)
@@ -420,9 +316,9 @@ def demo_molecular_landscape():
     ax3.legend()
     
     plt.tight_layout()
-    plt.savefig('molecular_energy_landscape.png', dpi=300, bbox_inches='tight')
+    plt.savefig('molecular_energy_landscape.png', dpi=150, bbox_inches='tight')
     print("\n✓ Visualization saved as 'molecular_energy_landscape.png'")
-    plt.show()
+    plt.close()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,29 @@
+{
+  "phase_1": {
+    "completed": true,
+    "timestamp": "2025-12-08T12:47:40.624122"
+  },
+  "phase_2": {
+    "completed": true,
+    "timestamp": "2025-12-08T12:47:41.923068",
+    "num_tests": 1
+  },
+  "phase_3": {
+    "completed": true,
+    "timestamp": "2025-12-08T12:47:43.177771",
+    "classical_best_energy": -4.784394954974716,
+    "quantum_best_energy": -9.213702281959835,
+    "improvement": 92.57821247344171
+  },
+  "phase_4": {
+    "completed": true,
+    "timestamp": "2025-12-08T12:47:44.762657",
+    "num_trials": 10,
+    "mean_classical_energy": -5.725089959252235,
+    "mean_quantum_energy": -6.330977274143313,
+    "mean_improvement": 17.178153574910752,
+    "p_value": 0.5900185472062436,
+    "statistically_significant": false,
+    "quantum_win_rate": 0.5
+  }
+}
